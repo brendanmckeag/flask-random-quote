@@ -20,10 +20,19 @@ def get_quote():
 def health():
     return jsonify({"status": "healthy"})
 
-# RunPod handler
+# RunPod handler - this is crucial for serverless integration
+@app.route('/', methods=['POST'])
+def handler():
+    """
+    Main handler for RunPod serverless requests.
+    RunPod serverless sends requests to the root path ('/'), not '/runsync'.
+    """
+    return jsonify({"output": get_quote().json})
+
+# For backward compatibility with direct testing
 @app.route('/runsync', methods=['POST'])
 def runsync_handler():
-    return jsonify({"output": get_quote().json})
+    return handler()
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
